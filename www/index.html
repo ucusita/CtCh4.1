@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html>
+  
+  <head>
+    <meta charset="utf-8">
+    <title>City Taxi</title>
+    <!-- <meta http-equiv="Content-Security-Policy" content="default-src *; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline' 'unsafe-eval'"> -->
+        
+    <link href="assets/css/bootstrap.css" media="all" rel="stylesheet">    
+    <link href="assets/css/app.css" media="all" rel="stylesheet">
+    <link href="assets/css/supersized.core.css" rel="stylesheet" type="text/css" media="screen" />
+    
+    <script type="text/javascript" src="assets/js/jquery.min.js"></script>
+    <script type="text/javascript" src="assets/js/bootstrap.min.js"></script>
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    name="viewport">
+    <meta name="description" content="Taxi es un servicio que te permite solicitar tu taxi. Te contacta con una flota de taxis formada por centenares de empresas. Simple y seguro, eso es City Taxi.">
+    <link rel="shortcut icon" type="image/x-icon" href="favicon.ico">
+
+    <script src="assets/js/supersized.core.3.2.1.min.js" type="text/javascript"></script>    
+    <script src="assets/js/lgntx.js"></script>    
+    <script src="assets/js/configuracion.js"></script>
+    <script src="assets/js/base_64.js"></script>
+
+    <!--Cordova-->
+    <script type="text/javascript" src="cordova.js"></script>
+
+
+    <!-- <style type="text/css">
+        html {
+          background: url(assets/img/taxif.jpg) no-repeat fixed center;
+          -webkit-background-size: cover;
+          -moz-background-size: cover;
+          -o-background-size: cover;
+          background-size:100% 100%;
+          background-size: cover;
+          }
+    </style>-->
+    
+  </head>
+  
+  <body>
+    <div class="signup-signin" id="login-form">
+      <strong class="line-thru">&nbsp;</strong>
+      <br>
+      <hr>      
+      <div class="alert alert-info" id="session-user-not-found"
+      style="display:none;">Usuario o contraseña incorrectos</div>
+      <form class="form-signin ajax-form"
+      role="form" id="frmLogin" draggable="true">
+        <h3 class="form-signin-heading">
+          Ingreso al sistema</h3><br>
+        <input id="dni" name="dni" type="text" class="form-control" placeholder="Documento de Identidad"
+        required="" autofocus=""><br>
+        <input id="unidad" name="unidad" class="form-control" placeholder="Placa del taxi"
+        required="" type="text"><br>
+        <input type="password" id="password" name="password" class="form-control"
+        placeholder="Contraseña" required=""><br>
+        <!-- <input type="hidden" id="CheckVIP" name="CheckVIP" class="form-control"> -->
+        <div class="checkbox">
+          <label>
+            <input type="checkbox" id="recordar"> Recordarme
+          </label>
+        </div><br>
+        <button class="btn btn-lg btn-green btn-block" type="submit">Ingresar<br>
+          <span class="glyphicon glyphicon-user"></span>
+        </button>
+      </form>
+      <br>
+      <a class="btn btn-lg btn-warning" data-toggle="modal" data-target="#reset-password-modal">Olvidé mi contraseña <span class="glyphicon glyphicon-thumbs-down"></span></a>
+      <p></p>
+      <a class="btn btn-lg btn-warning" data-toggle="modal" data-target="#registro-modal">Deseo registrarme <span class="glyphicon glyphicon-tasks"></span></a>
+      <br>
+      <br>
+      <br>
+      <hr>      
+      <br>
+      <br>
+      <br>
+    </div>
+    <div id="response"></div>
+    <div id="ajax-loader2" style="display:none;">
+      <img alt="Ajax loader" src="assets/img/ajax-loader.gif">
+    </div>
+    
+    <div aria-hidden="true" aria-labelledby="myModalLabel" class="modal fade"
+    id="reset-password-modal" role="dialog" tabindex="-1">
+      <div class="modal-dialog">
+        <div class="modal-content" id="reset-password-modal-content">
+          <form accept-charset="UTF-8" action="forgot_password" class="horizontal-form ajax-form form-forget"
+          method="post" id="frmForget">
+            <div class="modal-header">
+              <button aria-hidden="true" class="close" data-dismiss="modal" type="button">×</button>
+              <h4 class="modal-title">Recuperar contraseña</h4>
+            </div>
+            <div>
+              <div id="ajax-loader-forget" class="ajax-loader text-centered">
+                <img alt="Ajax loader" src="assets/img/ajax-loader.gif">
+              </div>
+              <div class="alert alert-info" id="alert-email-not-found" style="display:none">Email o contraseña incorrecta.</div>
+            </div>
+            <div id="form-content-forget">
+              <div class="modal-body">
+                <div class="form-group" style="overflow: hidden;">
+                  <label class="col-md-2 control-label" for="forgot_email" style="padding-top:7px;">Email</label>
+                  <div class="col-md-10">
+                    <input class="form-control" id="forgot_email" name="forgot_email" placeholder="Email"
+                    type="text">
+                  </div>
+                </div>
+              </div>
+              <div class="modal-footer text-centered">
+                <button class="btn btn-red" data-dismiss="modal" type="button">Cancelar</button>
+                <input class="btn btn-green" name="commit" type="submit"
+                value="Recuperar contraseña">
+              </div>
+            </div>
+          </form>
+        </div>
+        <!-- /.modal-content -->
+      </div>
+      <!-- /.modal-dialog -->
+    </div>
+    <!-- /.modal -->
+    <div aria-hidden="true" aria-labelledby="myModalLabel" class="modal fade"
+    id="registro-modal" role="dialog" tabindex="-1" style="">
+      <div class="modal-dialog">
+        <div class="modal-content" id="reset-password-modal-content">
+          <form accept-charset="UTF-8" action="registro" class="horizontal-form ajax-form form-register"
+          method="post" id="frmRegistro">
+            <div class="modal-header">
+              <button aria-hidden="true" class="close" data-dismiss="modal" type="button">×</button>
+              <h4 class="modal-title">Registro básico de nuevo usuario</h4>
+            </div>
+            <div>
+              <div id="ajax-loader-register" class="ajax-loader text-centered">
+                <img alt="Ajax loader" src="assets/img/ajax-loader.gif">
+              </div>
+              <div class="alert alert-info" id="register_msg" style="display:none">El usuario ya se encuentra registrado</div>
+            </div>
+            <div id="form-content-register">
+              <div class="modal-body">
+                <div id="ajax-loader-register" class="ajax-loader text-centered">
+                  <img alt="Ajax loader" src="assets/img/ajax-loader.gif">
+                </div>
+                <div class="form-group" style="overflow: hidden;">
+                  <label class="col-md-2 control-label" for="nombre" style="padding-top:7px;">Nombre completo</label>
+                  <div class="col-md-10">
+                    <input class="form-control" id="Nombre" name="Nombre" type="text" required="">
+                  </div>
+                </div>
+                <div class="form-group" style="overflow: hidden;" draggable="true">
+                  <label class="col-md-2 control-label" for="Dni" style="padding-top:7px;">Documento</label>
+                  <div class="col-md-6">
+                    <input class="form-control" id="Dni" name="Dni" required="" type="text"
+                    pattern=".{9,}">
+                  </div>
+                </div>
+                <div class="form-group" style="overflow: hidden;" draggable="true">
+                  <label class="col-md-2 control-label" for="forgot_email" style="padding-top:7px;">Email</label>
+                  <div class="col-md-10">
+                    <input class="form-control" id="Email" name="Email" placeholder="" type="email"
+                    required="">
+                  </div>
+                </div>
+                <div class="form-group" style="overflow: hidden;" draggable="true">
+                  <label class="col-md-2 control-label" for="Dni" style="padding-top:7px;">Fecha de Nacimiento</label>
+                  <div class="col-md-6" data-date="12-02-2012"
+                  data-date-format="mm-dd-yyyy">
+                    <input type="text" class="form-control" placeholder="dd-mm-aaaa" id="FechaNacimiento" name="FechaNacimiento">
+                  </div>
+                </div>
+                <div class="form-group" style="overflow: hidden;" draggable="true">
+                  <label class="col-md-2 control-label" for="password" style="padding-top:7px;">Contraseña</label>
+                  <div class="col-md-7">
+                    <input class="form-control" id="Clave" name="Clave" type="password" required=""
+                    pattern=".{6,}" title="mínimo 6 carácteres">
+                  </div>
+                </div>
+                <div class="form-group" style="overflow: hidden;">
+                  <label class="col-md-2 control-label" for="celular" style="padding-top:7px;">Celular</label>
+                  <div class="col-md-6">
+                    <input class="form-control" id="Celular" name="Celular" type="text" required=""
+                    pattern=".{9,}" title="mínimo 9 números">
+                  </div>
+                </div>
+                <div class="form-group" style="overflow: hidden;" draggable="true">
+                  <label class="col-md-2 control-label" for="celular" style="padding-top:7px;">Domicilio</label>
+                  <div class="col-md-6">
+                    <input class="form-control" id="domicilio" name="domicilio" type="text" required=""
+                    >
+                  </div>
+                </div>
+                <div class="form-group" style="overflow: hidden;" draggable="true">
+                  <label class="col-md-4 control-label" for="domicilio" style="padding-top:7px;">Licencia de Uso</label>
+                  <div class="col-md-6">
+                    <input class="form-control" id="codigovip" name="codigovip" type="text"
+                    required="">
+                  </div>
+                </div>
+                <p class="col-md-8 text-danger">Este registro le permite comenzar a trabajar, sin embargo
+                  usted deberá completar su perfil proveyendo sus datos a la empresa a fin
+                  de evitar posteriores incovenientes. Gracias.</p>
+              </div>
+              <div class="modal-footer text-centered">
+                <input class="btn btn-green" name="commit" type="submit" value="Enviar">
+              </div>
+            </div>
+          </form>
+        </div>
+        <!-- /.modal-content -->
+      </div>
+      <!-- /.modal-dialog -->
+    </div>
+
+    <!-- Pantalla para visualizar el crédito disponible -->
+    <div id="scnVerCredito" class="section" style='display:none'>
+      <div class="container">
+        <div class="row">
+          <div class="col-md-12">
+            <h2 class="text-success">VIP Coin$</h2>
+            <h4 class="text-primary">Datos de filiación</h4>
+            <table class="table table-striped table-bordered table-condensed table-hover">
+              <thead>
+                <tr>
+                  <th></th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="info">
+                  <th>Placa</th>
+                  <th id="lblPlaca">Alpha</th>
+                </tr>
+                <tr class="info">
+                  <td>Chofer</td>
+                  <td id="lblChofer">Bravo</td>
+                </tr>
+                <tr class="info">
+                  <td>Empresa</td>
+                  <td id="lblEmpresa">Charlie</td>
+                </tr>
+              </tbody>
+            </table>
+            <h4 class="text-success">Cuenta corriente</h4>
+            <table class="table table-striped table-bordered table-condensed table-hover">
+              <thead>
+                <tr>
+                  <th></th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="success">
+                  <th>Saldo en cuenta</th>
+                  <th id="lblSaldo">Alpha</th>
+                </tr>
+                <tr class="success">
+                  <td>Carreras en su haber</td>
+                  <td id="lblCarreras">Bravo</td>
+                </tr>
+                <tr class="success">
+                  <td>Costo por carrera</td>
+                  <td id="lblCPC">Charlie</td>
+                </tr>
+                <tr class="success" style="display:none">
+                  <td>Fecha vencimiento</td>
+                  <td id="lblVence">Charlie</td>
+                </tr>
+              </tbody>
+            </table>
+            <div class="btn-group btn-group-justified" role="group" aria-label="...">
+              <div class="btn-group" role="group">
+                <a href="javascript:ContinuarConCredito();" id='btnContinuar' type="button" class="btn btn-info">Continuar</a>
+              </div>
+              <div class="btn-group" role="group">
+                <a href="javascript:VerPOVs();" id='btnPOVs' type="button" class="btn btn-info">Ver POVs</a>
+              </div>
+              <div class="btn-group" role="group">
+                <a href="javascript:TerminarApp();" id='btnTerminar' type="button" class="btn btn-info">Terminar</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <footer></footer>
+  </body>
+
+</html>

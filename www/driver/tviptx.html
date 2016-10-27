@@ -1,0 +1,781 @@
+<!DOCTYPE html>
+<html>
+  <!-- version 3.0 -->
+  <head>
+    <meta charset="utf-8">
+    <title>City Taxi Chofer</title>
+    <!-- <meta name="viewport" content="width=device-width, initial-scale=1.0 user-scalable=yes maximum-scale=3"> -->
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport">
+    <meta name="description" content="Sitio de City Taxi">
+    <meta name="author" content="Infotronica">
+        
+    <link href="../assets/css/bootstrap.min.css" rel="stylesheet" type="text/css">
+    <script type="text/javascript" src="../assets/js/jquery.min.js"></script>
+    <script type="text/javascript" src="../assets/js/bootstrap.min.js"></script>
+    <!-- <link rel="www.radargps.com.ar" href=u rllocal + "/favicon.ico"
+    />-->
+
+    <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&libraries=places&sensor=true"></script>
+    <script src="../assets/js/configuracion.js"></script>
+    <script src="../assets/js/statusADS.js"></script>
+    <script src="../assets/js/base_64.js"></script>
+    <script src="../assets/js/jquery.percentageloader-01a.js"></script>
+
+    <!--Cordova-->
+    <script type="text/javascript" src="../cordova.js"></script>
+    <script type="text/javascript" src="../jscordova/PushNotification.js"></script>
+
+    <script type="text/javascript" src="../jscordova/index.js"></script> 
+    <script> app.initialize(); </script> 
+    
+    <style>
+      html {
+        height: 100%;
+          }
+      body {
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+        background: rgb(136,189,243); /* Old browsers */
+      }
+    
+      .jumbotron {
+        border-radius: 20px 20px 20px 20px;
+        -moz-border-radius: 20px 20px 20px 20px;
+        -webkit-border-radius: 20px 20px 20px 20px;
+        border: 5px solid #000000;        
+        -webkit-box-shadow: 10px 10px 31px 0px rgba(0,0,0,0.75);
+        -moz-box-shadow: 10px 10px 31px 0px rgba(0,0,0,0.75);
+        box-shadow: 10px 10px 31px 0px rgba(0,0,0,0.75);
+      }
+
+      .btn {
+        -webkit-box-shadow: 10px 7px 17px -5px rgba(0,0,0,0.74);
+        -moz-box-shadow: 10px 7px 17px -5px rgba(0,0,0,0.74);
+        box-shadow: 10px 7px 17px -5px rgba(0,0,0,0.74);
+        margin: 5px;
+        border: 1px solid #570303;
+      }
+
+      .panel
+      {
+        -webkit-box-shadow: 10px 10px 22px 0px rgba(0,0,0,0.74);
+        -moz-box-shadow: 10px 10px 22px 0px rgba(0,0,0,0.74);
+        box-shadow: 10px 10px 22px 0px rgba(0,0,0,0.74);
+      }
+      .panel-body{
+        background: rgba(255,255,255,1);
+        background: -moz-radial-gradient(center, ellipse cover, rgba(255,255,255,1) 0%, rgba(246,246,246,1) 53%, rgba(237,237,237,1) 100%);
+        background: -webkit-gradient(radial, center center, 0px, center center, 100%, color-stop(0%, rgba(255,255,255,1)), color-stop(53%, rgba(246,246,246,1)), color-stop(100%, rgba(237,237,237,1)));
+        background: -webkit-radial-gradient(center, ellipse cover, rgba(255,255,255,1) 0%, rgba(246,246,246,1) 53%, rgba(237,237,237,1) 100%);
+        background: -o-radial-gradient(center, ellipse cover, rgba(255,255,255,1) 0%, rgba(246,246,246,1) 53%, rgba(237,237,237,1) 100%);
+        background: -ms-radial-gradient(center, ellipse cover, rgba(255,255,255,1) 0%, rgba(246,246,246,1) 53%, rgba(237,237,237,1) 100%);
+        background: radial-gradient(ellipse at center, rgba(255,255,255,1) 0%, rgba(246,246,246,1) 53%, rgba(237,237,237,1) 100%);
+        filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#ededed', GradientType=1 );
+      }
+
+      .llamativo {
+        -webkit-animation: cssAnimation 0.886s 16 ease-in-out;
+        -moz-animation: cssAnimation 0.886s 16 ease-in-out;
+        -o-animation: cssAnimation 0.886s 16 ease-in-out;
+        }
+        @-webkit-keyframes cssAnimation {
+        from { -webkit-transform: rotate(0deg) scale(0.913) skew(1deg) translate(1px); }
+        to { -webkit-transform: rotate(0deg) scale(1) skew(1deg) translate(1px); }
+        }
+        @-moz-keyframes cssAnimation {
+        from { -moz-transform: rotate(0deg) scale(0.913) skew(1deg) translate(1px); }
+        to { -moz-transform: rotate(0deg) scale(1) skew(1deg) translate(1px); }
+        }
+        @-o-keyframes cssAnimation {
+        from { -o-transform: rotate(0deg) scale(0.913) skew(1deg) translate(1px); }
+        to { -o-transform: rotate(0deg) scale(1) skew(1deg) translate(1px); }
+      }
+    </style>
+    <script>
+        function onNotificationGCM3(result) {
+            alert(result.regid);
+        }
+    </script>
+  </head>
+  
+  <body onload="InicializaGPS1vez()">
+    <div class="navbar navbar-default navbar-inverse navbar-static-top" id='BarraTitulo' style='display:none'>
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar-ex-collapse">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar">Llamar al 105</span>
+          </button>
+          <a class="navbar-brand" href="#"><span>Taxi Taz</span></a>
+        </div>
+        <div class="collapse navbar-collapse" id="navbar-ex-collapse">
+          <ul class="nav navbar-nav navbar-right">
+            <li class="active">
+              <a href="javascript:LlamarPorTelefono105();">Llamar al 105</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div id="scrConectaGPS">
+      <div class="container">
+        <div class="row">
+          <br>
+          <div class="col-md-12">
+            <div class="panel panel-primary">
+              <div class="panel-heading">
+                <h3 class="panel-title" contenteditable="true">
+                  <span class="glyphicon glyphicon-globe"></span>
+                  <b>  Determinando posicion</b>
+                </h3>
+              </div>
+              <div class="panel-body">
+                <p>
+                  <b>1) Por favor encienda el GPS</b>
+                </p>
+                <p>
+                  <b>2) Preferentemente ubíquese en el exterior para que su GPS adquiera señal
+                  de satélite más rápidamente.</b>
+                </p>
+                <p>
+                  <b>3) Aguarde, le indicaré cuando la señal sea suficiente</b><br>
+                </p>
+                <br>
+                <div id="gpsEstado" style="display: none; text-align: center;" >
+                    
+                </div>                
+                <br>
+                <div style="width:100% text-align: center;">
+                    <div id="gpsGrafico" style="width:206px; margin: 0 auto; " >
+                    </div>                
+                </div>
+                <div class="row" id="conectado" style="display: none">
+                  <p class="text-center text-success">
+                    <b>¡City Taxi Conectado a satélites!</b>
+                  </p>
+                </div>
+              </div>
+            </div>
+            <a class="btn btn-block btn-lg btn-primary disabled"> </a>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div id="scrEstado" style="display: none">
+      <div class="container">
+          <div class="row">
+              <div class="col-md-6" draggable="true">
+                  <a href="javascript:Estado_Libre();" class="btn btn-block btn-lg btn-success"
+                  id="scrEstado_btnLibre">LIBRE<br><span class="glyphicon glyphicon-road"></span></a>
+                  <a href="javascript:Estado_Inactivo();" class="btn btn-block btn-lg btn-warning"
+                  id="scrEstado_btnInactivo">FUERA DE SERVICIO<br><span class="glyphicon glyphicon-ban-circle"></span></a>
+                  <a href="javascript:Estado_Emergencia();" class="btn btn-block btn-danger btn-lg"
+                  id="scrEstado_btnEmergencia">EMERGENCIA<br><span class="glyphicon glyphicon-fire"></span></a>
+              </div>
+              <div class="col-md-6">
+                  <h4>Estoy libre
+                      <br>
+                  </h4>
+                  <p>Seleccione este modo para indicar que se encuentra listo para trabajar
+                      y comenzar a recibir servicios..</p>
+                  <hr>
+                  <h4>Fuera de servicio</h4>
+                  <p>Mediante este modo indica que no se encuentra disponible. Úselo, por ejemplo,
+                      para indicar cuando se dispone a descanzar de sus actividades.</p>
+                  <hr>
+                  <h4>Emergencia</h4>
+                  <p>Con este botón indica cuando se encuentra en alguna emergencia y solicita
+                      asistencia del operador.</p>
+                  <hr>
+              </div>
+          </div>
+      </div>
+    </div>
+
+
+
+    <div id="scrLibre" style="display: none">
+      <div class="container">
+          <div class="row">
+              <div class="col-md-6">                  
+                  <div class="jumbotron" draggable="true" style="border:outset 2px #7a757a; background:-webkit-gradient(radial, 165 0, 0, 220 -257, 465, from(#18FF00), to(#005428)); color: #ffffff; text-shadow:3px 3px 5px #000000; ">
+                      <h1 class="text-center text-success">TAXI LIBRE</h1>
+                  </div>
+              </div>
+              <div class="col-md-6">
+                  <a href="javascript:PedidoInItinere();" class="btn btn-block btn-info btn-lg"
+                  id="btnServicioInItinere">SERVICIO IN ITINERE<br><span class="glyphicon glyphicon-send"><br></span></a>
+                  <a href="javascript:Estado_Inactivo();" class="btn btn-block btn-lg btn-warning"
+                  id="scrLibre_btnInactivo">FUERA DE SERVICIO&nbsp;<br><span class="glyphicon glyphicon-ban-circle"><br></span></a>
+                  <a href="javascript:Estado_Emergencia();" class="btn btn-block btn-danger btn-lg"
+                  id="scrLibre_btnEmergencia">EMERGENCIA&nbsp;<br><span class="glyphicon glyphicon-fire"><br></span></a>
+              </div>
+          </div>
+      </div>
+    </div>
+
+
+    <div id="scrInactivo" style="display: none">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="jumbotron" style="border:outset 2px #7a757a; background:-webkit-gradient(radial, 165 0, 0, 220 -257, 465, from(#E2DF00), to(#A66301)); color: #ffffff; text-shadow:3px 3px 5px #000000;">
+                        <h1 class="text-center text-success">Fuera de servicio</h1>
+                    </div>
+                </div>
+                <div class="col-md-6 text-center">
+                    <a href="javascript:Estado_Libre();" class="btn btn-block btn-lg btn-success"
+                    id="scrInactivo_btnLibre">LIBRE&nbsp;<br><span class="glyphicon glyphicon-road"></span></a>
+                    <a href="javascript:Estado_Emergencia();" class="btn btn-block btn-danger btn-lg"
+                    id="scrInactivo_btnEmergencia">EMERGENCIA&nbsp;<br><span class="glyphicon glyphicon-fire"><br></span></a>
+                    <a href="javascript:btnCerrarSesion();" class="btn btn-danger btn-lg"
+                    id="btnCerrarSesion">Terminar Sesión del día <span class="glyphicon glyphicon-log-out"></span></a>
+                </div>
+            </div>
+        </div>
+  </div>
+
+
+
+
+
+    <div id="scrEmergencia" style="display: none">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="jumbotron" style="border:outset 2px #7a757a; background:-webkit-gradient(radial, 165 0, 0, 220 -257, 465, from(#FF5600), to(#A60001)); color: #ffffff; text-shadow:3px 3px 5px #000000;">
+                        <h1 class="text-center text-success">Emergencia</h1>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <a href="javascript:Estado_Libre();" class="btn btn-block btn-lg btn-success"
+                    id="scrEmergencia_btnLibre">LIBRE&nbsp;<br><span class="glyphicon glyphicon-road"></span></a>
+                    <a href="javascript:Estado_Inactivo();" class="btn btn-block btn-lg btn-warning"
+                    id="scrEmergencia_btnInactivo">FUERA DE SERVICIO&nbsp;<br><span class="glyphicon glyphicon-ban-circle"><br></span></a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+
+
+    <div id="scrRecibeViaje" style="display: none">
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-6 " style="display:none">   <!--llamativo -->
+                        <div class="panel panel-primary">
+                            <div class="panel-heading">
+                                <h3 class="panel-title">Nuevo viaje solicitado:</h3>
+                            </div>
+                            <div class="panel-body">
+                                <div class="row">
+                                    <p class="text-primary col-xs-4">Direccion inicial</p>
+                                    <p class="text-center col-xs-8" id="dirInicial">
+                                        <b>Oidor Matienzo 26</b>
+                                    </p>
+                                </div>
+                                <div class="row">
+                                    <p class="text-primary col-xs-4">Referencia</p>
+                                    <p class="text-center col-xs-8" id="Referencia">Portones negros</p>
+                                </div>
+                                <div class="row">
+                                    <p class="text-primary col-xs-4">Direccion destino</p>
+                                    <p class="text-center col-xs-8" id="dirDestino">
+                                        <b>San Nicolas de Bari 28</b>
+                                    </p>
+                                </div>
+                                <div class="col-md-6 text-left" style="display:none">
+                                    <p class="text-primary">Moneda de pago</p>
+                                    <p class="text-center" id="Moneda">Dolares</p>
+                                </div>
+                                <div class="col-md-6 text-left" style="display:none">
+                                    <p class="text-primary">Vehiculo solicitado</p>
+                                    <p class="text-center" id="TipoVehiculo" draggable="true">Sedan</p>
+                                </div>
+                                <hr>
+                                <div class="row">
+                                    <p class="text-primary col-xs-4">Pasajero</p>
+                                    <p class="text-center col-xs-8" id="lblNombre">
+                                        <b>Juan Manuel Perez</b>
+                                    </p>
+                                </div>
+                                <div class="row">
+                                    <p class="text-primary col-xs-4">Email</p>
+                                    <p class="text-center col-xs-8" id="lblEmail">Juan@gmail.com</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xs-12 col-md-6">
+                            <h3 id="TituloRecibeViaje">Nuevo viaje solicitado:</h3>
+                            <hr>
+                            <a class="btn btn-block btn-lg btn-success" id="btnAceptaServicio" href="javascript:scrAceptaViaje();"
+                            draggable="true"><br>ACEPTO EL SERVICIO<br><span class="glyphicon glyphicon-flag"></span><br></a>
+                            <div class="row">
+                                <a class="col-xs-1" href=""> </a>
+                                <a style="display:none" class="btn btn-lg btn-warning col-xs-5" id="btnConsultaDireccion" href="javascript:MostrarConsultarDireccion();">Dirección <span class="glyphicon glyphicon-road"></span></a>
+                                <a style="display:none" class="btn btn-lg btn-primary col-xs-5" id="btnLlamar" href="javascript:LlamarPorTelefono();">Llamar <span class="glyphicon glyphicon-phone"></span></a>
+                            </div>
+                            <hr>
+                            <a class="btn btn-block btn-danger btn-lg col-xs-12" id="btnCancelaServicio"
+                            data-toggle="modal" data-target="#modCancelaViaje"><br>CANCELO EL SERVICIO<br> <span class="glyphicon glyphicon-remove-sign"></span><br></a>
+                        </div>  
+                    </div>
+            </div>
+        </div>
+
+    <!-- Auxiliar para aceptar viaje -->
+    <div id="modConsultarDireccion" style="display: none">
+      <div class="panel panel-primary" style="width:90% text-align:center">
+              <div class="panel-heading">
+                <h3 class="panel-title">Consultar dirección:</h3>
+              </div>
+              <div class="panel-body">
+                  <div> 
+                      <input id="inputDireccion" class="controls input-lg" type="text" placeholder="Escriba la direccion" style="width:100%;">
+                      <div id="mapConsultaDireccion" style="height:400px; width:100%"></div>                                              
+                  </div>
+              </div>
+      </div>        
+      <div class="modal-footer">
+          <a href="javascript:OcultarConsultarDireccion();" class="btn btn-block btn-lg btn-primary" id="btnVolverMap">Volver</a>
+      </div>
+    </div>
+
+
+
+
+    <div id="scrAceptaViaje" style="display: none">
+      <div class="container">
+          <div class="row">
+              <div class="col-md-6">
+                  <div class="panel panel-primary">
+                      <div class="panel-heading">
+                          <h3 class="panel-title">Nuevo viaje solicitado:</h3>
+                      </div>
+                      <div class="panel-body">
+                          <div class="row">
+                              <p class="text-primary col-xs-4">Direccion inicial</p>
+                              <p class="text-center col-xs-8" id="dirOrigen" draggable="true">Oidor Matienzo 26</p>
+                          </div>
+                          <div class="row">
+                              <p class="text-primary col-xs-4">Referencia</p>
+                              <p class="text-center col-xs-8" id="Referencia2">Portones negros</p>
+                          </div>
+                          <div class="row">
+                              <p class="text-primary col-xs-4">Direccion destino</p>
+                              <p class="text-center col-xs-8" id="dirDestino2">San Nicolas de Bari 28</p>
+                          </div>
+                          <div class="row" style="display:none">
+                              <p class="text-primary col-xs-4">Moneda de pago</p>
+                              <p class="text-center col-xs-8" id="Moneda2">Dolares</p>
+                          </div>
+                          <div class="row" style="display:none">
+                              <p class="text-primary col-xs-4">Vehiculo solicitado</p>
+                              <p class="text-center col-xs-8" id="TipoVehiculo2">Sedan</p>
+                          </div>
+                          <div class="row">
+                              <p class="text-primary col-xs-4">Nombre pasajero</p>
+                              <p class="text-center col-xs-8" id="lblNombre2">
+                                  <b>Juan Manuel Perez</b>
+                              </p>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+
+              <div class="col-xs-12 col-md-6">
+                      <a class="btn btn-block btn-lg btn-success" id="btnIniciaViaje" href="javascript:btnIniciaViaje();">Iniciar viaje <br>con pasajero <span class="glyphicon glyphicon-thumbs-up"></span></a>
+                      <div class="row" style="margin-left: auto; margin-right: auto;">
+                          <a href="javascript:btnConsultarTarifas();" class="btn btn-info center-block col-xs-5"
+                          id="btnConsultarTarifas">Consultar tarifas <br>de viajes <span class="glyphicon glyphicon-usd"></span></a>
+                          <a class="btn btn-primary col-xs-5 pull-right" href="javascript:Mensaje2Pasajero('Estoy en la dirección solicitada');" id="btnAvisarLlegada">Dar aviso<br> que llegó taxi <span class="glyphicon glyphicon-bullhorn"></span></a>
+                      </div>
+                      <div class="row" style="margin-left: auto; margin-right: auto;">
+                          <a class="btn btn-primary col-xs-5" id="btnEnviarMensaje" href="#" data-toggle="modal"
+                          data-target="#modEnviarMensaje">Enviar mensaje <br>a pasajero <span class="glyphicon glyphicon-comment"></span></a>
+                          <a class="btn btn-primary col-xs-5 pull-right" id="btnLlamarTel" href="javascript:LlamarPorTelefono();">Llamar al <br>pasajero <span class="glyphicon glyphicon-phone"></span></a>
+                      </div>
+                      <div class="row center-block">
+                          <a class="btn btn-warning center-block col-xs-5" href="javascript:MostrarConsultarRecorrido('Buscar Pasajero');"
+                          id="btnGuiarRecorrido">Guiame<br>al pasajero <span class="glyphicon glyphicon-map-marker"></span></a>
+                          <a class="btn btn-danger col-xs-5 pull-right" id="btnCancelarViaje" data-toggle="modal"
+                          data-target="#modCancelaViaje">Cancelar viaje <br>recibido <span class="glyphicon glyphicon-remove-sign"></span></a>
+                      </div>
+                  </div>
+              </div>
+
+
+              <div class="modal fade" id="modEnviarMensaje">
+                <div class="modal-dialog">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                      <h4 class="modal-title">Mensajes a pasajero</h4>
+                    </div>
+                      <div class="modal-body">
+                        <div class="list-group" id="listamensajes">
+                          <a href="javascript:Mensaje2Pasajero('Espéreme, estoy demorado');" class="list-group-item"
+                          style="background-color:#ffffa0"><h4>Espéreme, estoy demorado</h4></a>
+                          <!--<a href="javascript:Mensaje2Pasajero('Estoy en la dirección solicitada');"
+                          class="list-group-item" style="background-color:#FFFFD6"><h4>Estoy en la dirección solicitada</h4></a>-->
+                          <a href="javascript:Mensaje2Pasajero('Tardaré 5 minutos');" class="list-group-item"
+                          style="background-color:#ffffa0"><h4>Tardaré 5 minutos</h4></a>
+                          <a href="javascript:Mensaje2Pasajero('Enseguida estoy con usted');" class="list-group-item"
+                          style="background-color:#FFFFD6"><h4>Enseguida estoy con usted</h4></a>
+                          <a href="javascript:Mensaje2Pasajero('Ok');" class="list-group-item" style="background-color:#ffffa0"><h4>Ok</h4></a>
+                        </div>
+                      </div>
+                    <div class="modal-footer">
+                      <a class="btn btn-block btn-warning" data-dismiss="modal" id="btnCancelarEnviarMsg">Cancelar</a>
+                      <a class="btn btn-primary" id="btnEnviarMsg" style="display:none">Enviar mensaje</a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+
+              <!-- CONSULTAR TARIFA -->
+                  <div class="modal fade" id="modConsultarTarifas">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-body">
+                                    <div class="panel panel-primary text-center">
+                                        <div class="panel-heading">
+                                            <h3 class="panel-title">Origen -&gt; Destino</h3>
+                                        </div>
+                                        <div class="panel-body">
+                                            <div class="btn-group" id="dropOrigen">
+                                                <a class="btn btn-lg btn-primary dropdown-toggle" data-toggle="dropdown"
+                                                id="lblOrigen"> Elegir zona origen <span class="caret"></span></a>
+                                                <ul class="dropdown-menu" role="menu" id="ulOrigen">
+                                                    <li>
+                                                        <a href="#"></a>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                            <div class="btn-group" id="dropDestino">
+                                                <a id="lblDestino" class="btn btn-lg btn-primary dropdown-toggle" data-toggle="dropdown"> Elegir zona destino <span class="caret"></span></a>
+                                                <ul class="dropdown-menu" role="menu" id="ulDestino">
+                                                    <li>
+                                                        <a href="#"></a>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="panel panel-warning text-center">
+                                        <div class="panel-heading">
+                                            <h3 id="lblMonto" class="text-center text-success">
+                                                <b>$$$</b>
+                                            </h3>
+                                        </div>
+                                    </div>
+                                    <a href="javascript:btnVolverdeTarifas();" class="btn btn-block btn-lg btn-warning"
+                                    id="btnVolverdeTarifas">Volver</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+            </div>
+          </div>
+
+
+
+
+
+
+    <div id="scrRecorreViaje" style="display: none">
+      <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+              <div class="panel panel-primary">
+                <div class="panel-heading">
+                  <h3 class="panel-title">Recorrido del viaje</h3>
+                </div>
+                <div class="panel-body">              
+                  <a class="btn btn-block btn-lg btn-success" href="javascript:btnFinalizaServicio();"
+                     id="btnFinalizaServicio">Finalizar servicio<br><span class="glyphicon glyphicon-ok"></span></a>
+                  <hr>
+                  <a class="btn btn-block btn-lg btn-warning" id="btnConsultaRecorrido"
+                     href="javascript:MostrarConsultarRecorrido('Buscar destino viaje');">Consultar un recorrido <br><span class="glyphicon glyphicon-map-marker"></span><br></a>
+                  <hr>
+                  <a class="btn btn-block btn-danger btn-lg" data-toggle="modal" data-target="#modCancelaViaje"
+                     id="btnEmergencia">Emergencia <br><span class="glyphicon glyphicon-fire"></span></a>
+                </div>
+              </div>
+        </div>
+      </div>
+
+
+        <div class="modal fade" id="modTarifasViaje">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                        <h4 class="modal-title">Tarifas de viaje</h4>
+                    </div>
+                    <div class="modal-body">
+                          <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+                              <div class="panel panel-primary">
+                                  <div class="panel-heading" role="tab" id="headingOne">
+                                      <h4 class="panel-title">
+                                          <a data-toggle="collapse" data-parent="#accordion" href="#collapseOne"
+                                          aria-expanded="true" aria-controls="collapseOne">
+                                            Pago tabulado por zonas
+                                          </a>
+                                      </h4>
+                                  </div>
+                                  <div id="collapseOne" class="panel-collapse collapse" role="tabpanel"
+                                  aria-labelledby="headingOne">
+                                      <div class="panel-body">
+                                          <div class="btn-group" id="dropOrigen">
+                                              <a class="btn btn-lg btn-primary dropdown-toggle" data-toggle="dropdown"
+                                              id="lblOrigen2"> Elegir zona origen <span class="caret"></span></a>
+                                              <ul class="dropdown-menu" role="menu" id="ulOrigen2">
+                                                  <li>
+                                                      <a href="#"></a>
+                                                  </li>
+                                              </ul>
+                                          </div>
+                                          <div class="btn-group" id="dropDestino">
+                                              <a id="lblDestino2" class="btn btn-lg btn-primary dropdown-toggle" data-toggle="dropdown"> Elegir zona destino <span class="caret"></span></a>
+                                              <ul class="dropdown-menu" role="menu" id="ulDestino2">
+                                                  <li>
+                                                      <a href="#"></a>
+                                                  </li>
+                                              </ul>
+                                          </div>
+                                          <div class="panel-body">
+                                              <h3 id="lblMonto2" class="text-center text-success">
+                                                  <b>$$$</b>
+                                              </h3>
+                                              <a href="javascript:btnPagoTabuladoOk();" class="btn btn-block btn-danger"
+                                              id="btnPagoTabuladoOk">Asignar pago y finalizar <br><span class="glyphicon glyphicon-usd"></span></a>
+                                          </div>
+                                      </div>
+                                  </div>
+                              </div>
+                              <div class="panel panel-primary">
+                                  <div class="panel-heading" role="tab" id="headingTwo">
+                                      <h4 class="panel-title">
+                                          <a class="collapsed" data-toggle="collapse" data-parent="#accordion" href="#collapseTwo"
+                                          aria-expanded="false" aria-controls="collapseTwo">
+                                            Pago por monto directo
+                                          </a>
+                                      </h4>
+                                  </div>
+                                  <div id="collapseTwo" class="panel-collapse collapse" role="tabpanel"
+                                  aria-labelledby="headingTwo">
+                                      <div class="panel-body">
+                                          <form role="form">
+                                              <div class="form-group has-success">
+                                                  <div class="row">                                                      
+                                                      <div class="col-md-8">
+                                                          <input class="form-control input-lg" id="inpMonto" placeholder="Ingrese el monto aquí"
+                                                          type="text">
+                                                      </div>
+                                                  </div>
+                                                  <a href="javascript:btnPagoNoTabuladoOk();" class="btn btn-block btn-danger"
+                                                  id="btnPagoNoTabuladoOk">Asignar pago y finalizar <br><span class="glyphicon glyphicon-usd"></span></a>
+                                                  <button type="submit" class="btn btn-block btn-lg btn-success disabled hidden-lg hidden-md hidden-sm hidden-xs"
+                                                  id="btn">No Submit
+                                                      <span class="glyphicon glyphicon-usd"></span>
+                                                  </button>
+                                              </div>
+                                          </form>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+            
+                    </div>
+                <div class="modal-footer"></div>
+            </div>
+        </div>
+    </div>
+
+<!--
+      <div class="modal fade" id="modTarifasViaje">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                        <h4 class="modal-title">Tarifas de viaje</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="panel panel-primary">
+                            <div class="panel-heading">
+                                <h3 class="panel-title">Pago Tabulado</h3>
+                            </div>
+                            <div class="panel-body">
+                                <div class="btn-group" id="dropOrigen">
+                                    <a class="btn btn-lg btn-primary dropdown-toggle" data-toggle="dropdown"
+                                    id="lblOrigen2"> Elegir zona origen <span class="caret"></span></a>
+                                    <ul class="dropdown-menu" role="menu" id="ulOrigen2">
+                                        <li>
+                                            <a href="#"></a>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div class="btn-group" id="dropDestino">
+                                    <a id="lblDestino2" class="btn btn-lg btn-primary dropdown-toggle" data-toggle="dropdown"> Elegir zona destino <span class="caret"></span></a>
+                                    <ul class="dropdown-menu" role="menu" id="ulDestino2">
+                                        <li>
+                                            <a href="#"></a>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div class="row">
+                                    <div class="panel panel-warning text-center col-xs-12">
+                                        <div class="panel-heading">
+                                            <h4 id="lblMonto2" class="text-center text-success">
+                                                <b>$$$</b>
+                                            </h4>
+                                        </div>
+                                    </div>
+                                    <a href="javascript:btnPagoTabuladoOk();" class="btn btn-block btn-danger col-xs-4"
+                                    id="btnPagoTabuladoOk">Asignar pago y finalizar <br><span class="glyphicon glyphicon-usd"></span></a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="panel panel-primary">
+                            <div class="panel-heading">
+                                <h3 class="panel-title">Pago no tabulado</h3>
+                            </div>
+                            <div class="panel-body">
+                                <form role="form">
+                                    <div class="form-group has-success">
+                                        <div class="row">
+                                            <div class="col-md-4">
+                                                <label class="control-label" for="exampleInputEmail1">Aqui puede indicar el monto a pagar</label>
+                                            </div>
+                                            <div class="col-md-8">
+                                                <input class="form-control input-lg" id="inpMonto" placeholder="Ingrese el monto aquí"
+                                                type="text">
+                                            </div>
+                                        </div>
+                                        <a href="javascript:btnPagoNoTabuladoOk();" class="btn btn-block btn-danger"
+                                        id="btnPagoNoTabuladoOk">Asignar pago y finalizar <br><span class="glyphicon glyphicon-usd"></span></a>
+                                        <button type="submit" class="btn btn-block btn-lg btn-success disabled hidden-lg hidden-md hidden-sm hidden-xs"
+                                        id="btn">No Submit
+                                            <span class="glyphicon glyphicon-usd"></span>
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+
+
+
+                    </div>
+                    <div class="modal-footer"></div>
+                </div>
+            </div>
+        </div>
+-->
+
+
+
+
+    </div>
+    </div>
+      <div>
+        <div id="modConsultarRecorrido" style="display: none">
+            <div class="panel panel-primary" style="width:90%; text-align:center;">
+                    <div class="panel-heading">
+                      <h3 class="panel-title">Consultar recorrido:</h3>
+                    </div>
+                    <div class="panel-body">
+                        <div> 
+                            <input id="inputDireccion2" class="controls input-lg" type="text" placeholder="Escriba la direccion" style="width:100%;">
+                            <div id="mapConsultaDireccion2" style="height:400px; width:100%;"></div>                                              
+                        </div>
+                    </div>
+            </div>        
+            <div class="modal-footer">
+                <a href="javascript:OcultarConsultarRecorrido();" class="btn btn-block btn-danger btn-lg" id="btnVolverMap2">Volver</a>
+            </div>
+        
+      
+          <div id="modRecorrido">
+              <div class="panel panel-primary" style="width:90%; text-align:center;">
+                <div class="panel-heading">
+                  <h3 class="panel-title">Consulta de recorrido más eficiente</h3>
+                </div>
+                <div class="panel-body" id="ContenidoPanel">
+                  
+                </div>
+              </div>
+          </div>
+      </div>
+    </div>
+
+
+    <div id="modCancelaViaje" class="modal fade" style="display: none">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+            <h4 class="modal-title">Confirme cancelación</h4>
+          </div>
+          <div class="modal-body">
+            <p>Si cancela, su acción quedará registrada en el servicio solicitado y el
+              pasajero deberá volver a pedir un nuevo taxi.
+              <br>
+            </p>
+            <h4 contenteditable="true" class="text-center">¿Está seguro de cancelar?</h4>
+          </div>
+          <div class="modal-footer">
+              <div class="row col-xs-12">
+                  <a class="btn btn-lg btn-success col-xs-5 pull-right" data-dismiss="modal"
+                  id="btnNoCancelarViaje">Volver</a>
+                  <a href="javascript:btnCancelarViajeRecibido();" class="btn btn-danger btn-lg col-xs-5 pull-right"
+                  id="btnCancelarViajeRecibido">Cancelar</a>
+              </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+
+
+
+    <div id="modal-alerts" aria-hidden="true" aria-labelledby="myModalLabel"
+    class="modal fade" role="dialog" tabindex="-1">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal">
+              <span aria-hidden="true">×</span>
+              <span class="sr-only">X</span>
+            </button>
+            <h4 class="modal-title" id="alert_title"></h4>
+          </div>
+          <div class="modal-body">
+            <div id="alert_content"></div>
+            <div class="row">
+              <div class="col-md-12 text-center">
+                <button class="btn btn-block btn-lg btn-primary" data-dismiss="modal" type="button">Aceptar</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>    
+
+  </body>
+
+</html>
